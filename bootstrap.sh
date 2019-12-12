@@ -4,7 +4,7 @@ set -uex
 
 function safe_run {
   if [[ ! -f "${HAPROXY_CONFIG}" ]]; then
-    echo "No suitable config" >&2
+    echo "No config.." >&2
     exit 1
   fi
   ${HAPROXY_CHECK_CONFIG_CMD} && RC=0 || RC=1
@@ -27,7 +27,6 @@ HAPROXY_CONFIG=${HAPROXY_CONFIG:-"/etc/haproxy/haproxy.cfg"}
 HAPROXY_PORTS=${HAPROXY_PORTS:-"80,443"}
 HAPROXY_INVALID_MSG="Invalid HAProxy configuration - check the logs, leaving old config.."
 HAPROXY_VALID_MSG="Looks good - reload completed."
-SLACK_URL=${SLACK_URL:-""}
 
 HAPROXY_PID_FILE="/var/run/haproxy.pid"
 HAPROXY_CMD="sudo /usr/local/sbin/haproxy -f ${HAPROXY_CONFIG} -p ${HAPROXY_PID_FILE}"
@@ -41,7 +40,6 @@ DISABLE_SYN_DROP="sudo iptables -D INPUT -p tcp -m multiport --dport ${HAPROXY_P
 $LIST_IPTABLES
 
 sudo service rsyslog start
-sudo service filebeat start
 sudo service cron start
 
 safe_run
