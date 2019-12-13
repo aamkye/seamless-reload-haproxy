@@ -18,11 +18,15 @@ Example:
 
 ## Features:
 
-  * Support for all features from HAProxy
-  * Based on official haproxy image
-  * Logging traffic and admin requsts to files
+  * Support for all features from HAProxy.
+  * Based on official haproxy image.
+  * Logging traffic and admin requsts to files.
   * Log rotation via logrotate to optimize space usage.
-  * Auto restart when: config, ssl certs or /etc/hosts changes. This container comes with inotify to monitor changes in HAProxy all previous things and reload HAProxy daemon. The reload is done in a way that no connection is lost.
+  * This container comes with inotify to monitor changes in HAProxy container and reloads HAProxy daemon.
+  * Auto reload when: config, ssl certs or /etc/hosts changes.
+  * The reload is done in a way that no connection is lost.
+  * Ability to notify about reload success/fail over slack apihook.
+  * Ability to be still operational if uploaded config is invalid.
 
 ## ENV variables
 
@@ -50,7 +54,6 @@ docker run -it --rm \
 
 ### Ansible usage
 
-*[from file](./ansible_example.yml)*
 ```
 # Requires latest ansible devel
 
