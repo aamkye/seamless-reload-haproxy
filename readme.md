@@ -1,7 +1,7 @@
-# [WIP] Seamless reload HAProxy (SRH)
+# Seamless reload for HAProxy
 
-[![Build Method](https://img.shields.io/docker/cloud/automated/lodufqa/haproxy)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
-[![Build Status](https://img.shields.io/docker/cloud/build/lodufqa/haproxy)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
+[![Build Method](https://img.shields.io/docker/cloud/automated/lodufqa/haproxy)](https://hub.docker.com/repository/docker/lodufqa/haproxy/builds)
+[![Build Status](https://img.shields.io/docker/cloud/build/lodufqa/haproxy)](https://hub.docker.com/repository/docker/lodufqa/haproxy/builds)
 [![GitHub Open Issues](https://img.shields.io/github/issues/amadeuszkryze/seamless-reload-haproxy)](https://github.com/amadeuszkryze/seamless-reload-haproxy/issues)
 [![Release](https://img.shields.io/github/v/release/amadeuszkryze/seamless-reload-haproxy?include_prereleases)](https://github.com/amadeuszkryze/seamless-reload-haproxy/releases)
 
@@ -15,7 +15,8 @@
 Please specify tag when deploying for specific version.
 Example:
 
-`lodufqa/haproxy:2.0.10`
+* `lodufqa/haproxy:latest`
+* `lodufqa/haproxy:2.0.10`
 
 ## Features:
 
@@ -53,7 +54,7 @@ docker run -it --rm \
   lodufqa/haproxy:2.0.10
 ```
 
-### Ansible usage
+### Ansible
 
 ```
 # Requires latest ansible devel
