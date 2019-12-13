@@ -1,6 +1,7 @@
 # [WIP] Seamless reload HAProxy (SRH)
 
-[![Build Status](https://img.shields.io/travis/amadeuszkryze/seamless-reload-haproxy)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
+[![Build Method](https://img.shields.io/docker/cloud/automated/lodufqa/haproxy)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
+[![Build Status](https://img.shields.io/docker/cloud/build/lodufqa/haproxy)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
 [![GitHub Open Issues](https://img.shields.io/github/issues/amadeuszkryze/seamless-reload-haproxy)](https://github.com/amadeuszkryze/seamless-reload-haproxy/issues)
 [![Release](https://img.shields.io/github/v/release/amadeuszkryze/seamless-reload-haproxy?include_prereleases)](https://github.com/amadeuszkryze/seamless-reload-haproxy/releases)
 
@@ -56,6 +57,14 @@ docker run -it --rm \
 
 ```
 # Requires latest ansible devel
+- name: "Install deps"
+  become: True
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-setuptools
+    - python-docker
 
 - name: "Get info of HAProxy container"
   docker_container_info:
@@ -97,4 +106,5 @@ docker run -it --rm \
     env:
       HAPROXY_CONFIG: /haproxy_config/haproxy.cfg
       HAPROXY_PORTS: 80,443,1194,7999,8000,8080 #This is important.
+      SLACK_URL: https://slackurl.com/whaterevisyourslackurlbutkeepitsecret
 ```
