@@ -1,10 +1,16 @@
-FROM haproxy:2.0.10
+ARG GIT_TAG
+ARG GIT_SHA
+ARG GIT_BRANCH
+ARG GIT_DATE
+ARG BUILD_DATE
 
-LABEL com.haproxy.git.tag="$(git describe --tags --abbrev=0)"
-LABEL com.haproxy.git.sha="$(git log --pretty=format:'%h' -n 1)"
-LABEL com.haproxy.git.branch="$(git rev-parse --abbrev-ref HEAD)"
-LABEL com.haproxy.git.date="$(git log --pretty=format:'%cI' -n 1)"
-LABEL com.haproxy.build.date="$(date --iso-8601=seconds)"
+FROM haproxy:"${GIT_TAG}"
+
+LABEL com.haproxy.git.tag="${GIT_TAG}"
+LABEL com.haproxy.git.sha="${GIT_SHA}"
+LABEL com.haproxy.git.branch="${GIT_BRANCH}"
+LABEL com.haproxy.git.date="${GIT_DATE}"
+LABEL com.haproxy.build.date="${BUILD_DATE}"
 
 ENV HAPROXY_CONFIG='/etc/haproxy/haproxy.cfg'
 ENV HAPROXY_PORTS='80,443'
