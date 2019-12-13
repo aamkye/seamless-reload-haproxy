@@ -50,6 +50,7 @@ function notify {
 
   if [[ ! -z ${SLACK_URL} ]]; then
     curl \
+      --insecure \
       -X POST \
       -H 'Content-type: application/json' \
       --data "{ \

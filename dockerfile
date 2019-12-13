@@ -18,13 +18,13 @@ ENV HAPROXY_PORTS='80,443'
 ### Install packages and prepare container
 # bash-completion \
 # certbot \
-# cron \
 # vim \
 
 RUN \
   apt-get update \
   && apt-get install -y --no-install-recommends \
     apt-transport-https \
+    cron \
     curl \
     inotify-tools\
     iptables \
