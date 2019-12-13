@@ -1,10 +1,8 @@
 # [WIP] Seamless reload HAProxy (SRH)
 
-[![Build Status](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy.svg?branch=master)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
-[![GitHub Open Issues](https://img.shields.io/github/issues/amadeuszkryze/seamless-reload-haproxy.svg)](https://github.com/amadeuszkryze/seamless-reload-haproxy/issues)
-[![Stars](https://img.shields.io/github/stars/amadeuszkryze/seamless-reload-haproxy.svg?style=social&label=Stars)]()
-[![Fork](https://img.shields.io/github/forks/amadeuszkryze/seamless-reload-haproxy.svg?style=social&label=Fork)]()
-[![Release](https://img.shields.io/github/release/amadeuszkryze/seamless-reload-haproxy.svg)](http://microbadger.com/images/lodufqa/haproxy.svg)
+[![Build Status](https://img.shields.io/travis/amadeuszkryze/seamless-reload-haproxy)](https://travis-ci.org/amadeuszkryze/seamless-reload-haproxy)
+[![GitHub Open Issues](https://img.shields.io/github/issues/amadeuszkryze/seamless-reload-haproxy)](https://github.com/amadeuszkryze/seamless-reload-haproxy/issues)
+[![Release](https://img.shields.io/github/v/release/amadeuszkryze/seamless-reload-haproxy?include_prereleases)](https://github.com/amadeuszkryze/seamless-reload-haproxy/releases)
 
 [![Docker build](http://dockeri.co/image/lodufqa/haproxy)](https://hub.docker.com/repository/docker/lodufqa/haproxy)
 
@@ -12,7 +10,7 @@
 * https://github.com/million12/docker-haproxy
 * https://engineeringblog.yelp.com/2015/04/true-zero-downtime-haproxy-reloads.html
 
-### Tags
+## Tags
 Please specify tag when deploying for specific version.
 Example:
 
@@ -53,3 +51,47 @@ docker run -it --rm \
 ### Ansible usage
 
 *[from file](./ansible_example.yml)*
+```
+# Requires latest ansible devel
+
+- name: "Get info of HAProxy container"
+  docker_container_info:
+    name: haproxy
+  register: haproxy_container
+
+- name: "Pull HAProxy"
+  docker_image:
+    name: lodufqa/haproxy
+    force_source: yes
+    source: pull
+    state: present
+    tag: "{{ haproxy_image_version | default('2.0.10') }}"
+
+- name: "Docker run haproxy"
+  when: haproxy_setup | default(false) | bool == True or (not haproxy_container.exists or haproxy_container.container.State.Status != 'running')
+  become: True
+  docker_container:
+    container_default_behavior: compatibility
+    image: "lodufqa/haproxy:{{ haproxy_image_version | default('2.0.10') }}"
+    hostname: "{{ ansible_inventory }}"
+    name: haproxy
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - 0.0.0.0:80:80 #HTTP
+      - 0.0.0.0:443:443 #HTTPS
+      - 0.0.0.0:1194:1194 #OPENVPN
+      - 0.0.0.0:7999:7999 #ACME
+      - 0.0.0.0:8000:8000 #HAProxyStats
+      - 0.0.0.0:8003:8003 #HAProxy Exporter
+      - 0.0.0.0:8080:8080 #Something else
+    recreate: true
+    volumes:
+      - /haproxy_config:/haproxy_config
+      - /haproxy_certs:/etc/ssl/private
+    capabilities:
+      - NET_ADMIN
+    env:
+      HAPROXY_CONFIG: /haproxy_config/haproxy.cfg
+      HAPROXY_PORTS: 80,443,1194,7999,8000,8080 #This is important.
+```
