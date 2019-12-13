@@ -5,7 +5,7 @@
   docker_container:
     container_default_behavior: compatibility
     image: "this-haproxy:{{ haproxy_image_version | default('2.0.10') }}"
-    hostname: "{{ ec2_tag_env }}_{{ ec2_tag_name }}"
+    hostname: "{{ ansible_inventory }}"
     name: haproxy
     state: started
     restart_policy: unless-stopped
