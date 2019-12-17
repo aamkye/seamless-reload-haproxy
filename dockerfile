@@ -15,15 +15,11 @@ LABEL com.haproxy.build.date="${BUILD_DATE}"
 ENV HAPROXY_CONFIG='/etc/haproxy/haproxy.cfg'
 ENV HAPROXY_PORTS='80,443'
 
-### Install packages and prepare container
-# bash-completion \
-# certbot \
-# vim \
-
 RUN \
   apt-get update \
   && apt-get install -y --no-install-recommends \
     apt-transport-https \
+    certbot \
     cron \
     curl \
     inotify-tools\
@@ -42,6 +38,7 @@ RUN \
 ### Copy files
 COPY haproxy.rsyslog.conf /etc/rsyslog.d/haproxy.conf
 COPY haproxy.logrotate.conf /etc/logrotate.d/haproxy
+COPY regenerate.sh /
 COPY functions.sh /
 COPY bootstrap.sh /
 

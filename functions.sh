@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export PS4='+ $0:$LINENO '
+
 HAPROXY_VALID_MSG=${HAPROXY_VALID_MSG:-"Looks good - reload completed."}
 HAPROXY_INVALID_MSG=${HAPROXY_INVALID_MSG:-"Invalid HAProxy configuration - check the logs, leaving old config.."}
 

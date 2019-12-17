@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export PS4='+ $0:$LINENO '
 set -uex
 
 GIT_TAG="$(git describe --tags --abbrev=0)"

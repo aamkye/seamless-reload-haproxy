@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export PS4='+ $0:$LINENO '
+
 set -uex
 source ./functions.sh --source-only
 
