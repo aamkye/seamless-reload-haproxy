@@ -109,3 +109,112 @@ docker run -it --rm \
       HAPROXY_PORTS: 80,443,1194,7999,8000,8080 #This is important.
       SLACK_URL: https://slackurl.com/whaterevisyourslackurlbutkeepitsecret
 ```
+
+### Sample config
+```
+global
+    ### Process management and security
+    log 127.0.0.1:514 local0 info
+    daemon
+    chroot /var/lib/haproxy
+    user haproxy
+    group haproxy
+    pidfile /var/run/haproxy.pid
+
+    ### SSL https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.5&config=modern
+    ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+    ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+    ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+
+    ssl-default-server-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+    ssl-default-server-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+    ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+
+    ### Performance tuning
+    maxconn 50000
+    maxsslconn 50000
+    maxconnrate 5000
+    maxsslrate 5000
+    maxsessrate 4000
+
+    spread-checks 33
+    max-spread-checks 10
+    tune.chksize 32768
+    tune.ssl.lifetime 300
+    tune.ssl.default-dh-param 2048
+
+defaults
+    log global
+    mode http
+    option dontlognull
+    option httplog
+    option abortonclose
+    option http-keep-alive
+    option forwardfor
+    option redispatch
+    option allbackups
+    option http-use-htx
+    retries 3
+
+    timeout connect 60s
+    timeout client 60s
+    timeout server 120s
+    timeout queue 120s
+    timeout http-request 60s
+    timeout http-keep-alive 60s
+
+    errorfile 400 /etc/haproxy/errors-custom/400.http
+    errorfile 403 /etc/haproxy/errors-custom/403.http
+    errorfile 405 /etc/haproxy/errors-custom/403.http
+    errorfile 408 /etc/haproxy/errors-custom/408.http
+    errorfile 500 /etc/haproxy/errors-custom/500.http
+    errorfile 502 /etc/haproxy/errors-custom/502.http
+    errorfile 503 /etc/haproxy/errors-custom/503.http
+    errorfile 504 /etc/haproxy/errors-custom/504.http
+
+frontend MAIN_FRONTNED
+    ### BINDS
+    bind *:80 alpn h2,http/1.1 tfo
+    bind *:443 ssl crt acme.test.com.pem alpn h2,http/1.1 tfo
+
+    ### BLOCKED IPS
+    acl BLOCKED_IP src 1.2.3.4
+    http-request deny if BLOCKED_IP
+
+    ### ACME letsencrypt
+    acl ACME_ACL path_beg -i /.well-known/acme-challenge/
+
+    ### Restricted ACL
+    acl RESTRICTED_IP_ACL src 10.0.0.0/8
+
+    ### X-Forwarded-* headers
+    http-request add-header X-Forwarded-Host %[req.hdr(host)]
+    http-request add-header X-Forwarded-Server %[req.hdr(host)]
+    http-request add-header X-Forwarded-Dst-Port %[dst_port]
+    http-request add-header X-Forwarded-Src-Port %[src_port]
+    http-request set-header X-Forwarded-Proto https if { ssl_fc }
+    http-request add-header X-Custom-SSL-Version %sslv if { ssl_fc }
+    http-request add-header X-Custom-SSL-Cipher %sslc if { ssl_fc }
+
+    ### HTTPS redirect if HTTP
+    redirect scheme https code 301 if !{ ssl_fc }
+
+    use_backend XXX
+
+backend XXX
+    ...
+
+backend ACME
+    server local localhost:7999
+
+frontend STATS
+    bind *:8404
+    http-request use-service prometheus-exporter if { path /metrics }
+    stats enable
+    stats uri /stats
+    stats refresh 10s
+
+```
