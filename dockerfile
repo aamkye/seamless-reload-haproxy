@@ -4,7 +4,7 @@ ARG GIT_BRANCH
 ARG GIT_DATE
 ARG BUILD_DATE
 
-FROM haproxy:2.0.10
+FROM haproxy:2.0.12
 
 LABEL com.haproxy.git.tag="${GIT_TAG}"
 LABEL com.haproxy.git.sha="${GIT_SHA}"
@@ -24,6 +24,8 @@ RUN \
     curl \
     inotify-tools\
     iptables \
+    logrotate \
+    vim \
     rsyslog \
     sudo \
   && rm -rf /var/lib/apt/lists/* \
