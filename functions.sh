@@ -63,6 +63,6 @@ function notify {
           \"color\": \"${SLACK_COLOR}\", \
         }] \
       }" \
-      "${SLACK_URL}"
+      "${SLACK_URL}" | true
   fi
 }
