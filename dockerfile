@@ -19,15 +19,16 @@ RUN \
   apt-get update \
   && apt-get install -y --no-install-recommends \
     apt-transport-https \
+    ca-certificates \
     certbot \
     cron \
     curl \
     inotify-tools\
     iptables \
     logrotate \
-    vim \
     rsyslog \
     sudo \
+    vim \
   && rm -rf /var/lib/apt/lists/* \
   && groupadd -g 1000 -r haproxy \
   && useradd -m -r -g haproxy -u 1000 haproxy \
