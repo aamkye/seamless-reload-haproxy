@@ -4,7 +4,7 @@ ARG GIT_BRANCH
 ARG GIT_DATE
 ARG BUILD_DATE
 
-FROM haproxy:2.0.12
+FROM haproxy:2.2.0
 
 LABEL com.haproxy.git.tag="${GIT_TAG}"
 LABEL com.haproxy.git.sha="${GIT_SHA}"
@@ -42,6 +42,7 @@ RUN \
 COPY haproxy.rsyslog.conf /etc/rsyslog.d/haproxy.conf
 COPY haproxy.logrotate.conf /etc/logrotate.d/haproxy
 COPY regenerate.sh /
+COPY simple_regenerate.sh /
 COPY functions.sh /
 COPY bootstrap.sh /
 
