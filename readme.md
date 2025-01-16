@@ -9,14 +9,13 @@
 
 ## Highly inspired by:
 * https://github.com/million12/docker-haproxy
-* https://engineeringblog.yelp.com/2015/04/true-zero-downtime-haproxy-reloads.html
 
 ## Tags
 Please specify tag when deploying for specific version.
 Example:
 
 * `lodufqa/haproxy:latest`
-* `lodufqa/haproxy:2.0.10`
+* `lodufqa/haproxy:3.1.2`
 
 ## Features:
 
@@ -51,7 +50,7 @@ docker run -it --rm \
   --cap-add=NET_ADMIN \
   -v /haproxy_config:/haproxy_config \
   -v /haproxy_certs:/etc/ssl/private \
-  lodufqa/haproxy:2.0.10
+  lodufqa/haproxy:3.1.2
 ```
 
 ### Ansible
@@ -78,14 +77,14 @@ docker run -it --rm \
     force_source: yes
     source: pull
     state: present
-    tag: "{{ haproxy_image_version | default('2.0.10') }}"
+    tag: "{{ haproxy_image_version | default('3.1.2') }}"
 
 - name: "Docker run haproxy"
   when: haproxy_setup | default(false) | bool == True or (not haproxy_container.exists or haproxy_container.container.State.Status != 'running')
   become: True
   docker_container:
     container_default_behavior: compatibility
-    image: "lodufqa/haproxy:{{ haproxy_image_version | default('2.0.10') }}"
+    image: "lodufqa/haproxy:{{ haproxy_image_version | default('3.1.2') }}"
     hostname: "{{ ansible_inventory }}"
     name: haproxy
     state: started
