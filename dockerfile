@@ -33,27 +33,25 @@ RUN \
     systemctl \
     vim && \
   rm -rf /var/lib/apt/lists/* && \
-  # groupadd -g 1000 -r haproxy && \
-  # useradd -m -r -g haproxy -u 1000 haproxy && \
   sudo usermod -a -G sudo haproxy && \
   echo "haproxy ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/haproxy && \
   chmod 0440 /etc/sudoers.d/haproxy && \
   mkdir -p /var/lib/haproxy /etc/ssl && \
   chown haproxy:haproxy /var/lib/haproxy && \
-  install -m 777 /dev/null /var/log/cron.log
+  install -m 777 /dev/null /var/log/cron.log && \
+  curl -OL git.io/ansi && chmod 755 ansi && sudo mv ansi /usr/bin/
 
 ### Copy files
-COPY haproxy.rsyslog.conf /etc/rsyslog.d/haproxy.conf
-COPY haproxy.logrotate.conf /etc/logrotate.d/haproxy
-COPY regenerate.sh /
-COPY simple_regenerate.sh /
-COPY functions.sh /
-COPY bootstrap.sh /
+COPY configs/haproxy.rsyslog.conf /etc/rsyslog.d/haproxy.conf
+COPY configs/haproxy.logrotate.conf /etc/logrotate.d/haproxy
+COPY scripts/regenerate.sh /
+COPY scripts/bootstrap.sh /
 
 ### File modes
 RUN \
-  chmod 644 /etc/rsyslog.d/haproxy.conf \
-  && chmod 644 /etc/logrotate.d/haproxy
+  chmod 644 /etc/rsyslog.d/haproxy.conf && \
+  chmod 644 /etc/logrotate.d/haproxy && \
+  chmod +r /etc/ssl/private
 
 USER haproxy
 ENTRYPOINT ["bash", "-c", "/bootstrap.sh"]

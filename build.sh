@@ -17,6 +17,7 @@ GIT_DATE="$(git log --pretty=format:'%cI' -n 1)"
 BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 ${DOCKER_CMD} build --file=dockerfile --tag=lodufqa/haproxy:${GIT_TAG} \
+  --platform linux/amd64 \
   --build-arg GIT_TAG="${GIT_TAG:-''}" \
   --build-arg GIT_SHA="${GIT_SHA:-''}" \
   --build-arg GIT_BRANCH="${GIT_BRANCH:-''}" \

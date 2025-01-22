@@ -1,0 +1,20 @@
+services:
+  haproxy:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: haproxy
+    hostname: haproxy
+    ports:
+      - 0.0.0.0:80:80 #HTTP
+      - 0.0.0.0:443:443 #HTTPS
+      - 0.0.0.0:8404:8404 #HAProxyStats
+    volumes:
+      - ./configs/example.haproxy.cfg:/etc/haproxy/haproxy.cfg
+      # - ./haproxy_certs:/etc/ssl/private
+    cap_add:
+      - CAP_AUDIT_WRITE
+      - NET_ADMIN
+    environment:
+      HAPROXY_CONFIG: /etc/haproxy/haproxy.cfg
+      HAPROXY_PORTS: 80,443

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-export PS4='+ $0:$LINENO '
+export PS4='+ $(date --iso-8601=s) $0:$LINENO '
+
+set -uex
+
+export TERM="xterm-256color"
 
 HAPROXY_VALID_MSG=${HAPROXY_VALID_MSG:-"Looks good - reload completed."}
 HAPROXY_INVALID_MSG=${HAPROXY_INVALID_MSG:-"Invalid HAProxy configuration - check the logs, leaving old config.."}
@@ -14,6 +18,7 @@ HAPROXY_PORTS=${HAPROXY_PORTS:-"80,443"}
 HAPROXY_PID_FILE="/var/run/haproxy.pid"
 HAPROXY_CMD="sudo /usr/local/sbin/haproxy -f ${HAPROXY_CONFIG} -p ${HAPROXY_PID_FILE}"
 HAPROXY_CHECK_CONFIG_CMD="/usr/local/sbin/haproxy -c -- ${HAPROXY_CONFIG}"
+
 
 SLACK_URL=${SLACK_URL:-}
 
@@ -41,11 +46,11 @@ function safe_run {
 
 function notify {
   if [[ ${RC} -ne 0 ]]; then
-    echo "${HAPROXY_INVALID_MSG}" >&2
+    echo -e "\n--- $(ansi --red -- $(date --iso-8601=s): ${HAPROXY_INVALID_MSG}) ---\n" >&2
     SLACK_MESSAGE="${HAPROXY_INVALID_MSG}"
     SLACK_COLOR="danger"
   else
-    echo "${HAPROXY_VALID_MSG}"
+    echo -e "\n--- $(ansi --green -- $(date --iso-8601=s): ${HAPROXY_VALID_MSG}) ---\n"
     SLACK_MESSAGE="${HAPROXY_VALID_MSG}"
     SLACK_COLOR="good"
   fi
@@ -66,3 +71,19 @@ function notify {
       "${SLACK_URL}" | true
   fi
 }
+
+# --cap-add CAP_AUDIT_WRITE || sudo
+# --cap-add NET_ADMIN || iptables
+function main {
+  sudo iptables --list
+
+  sudo systemctl restart rsyslog
+  sudo systemctl restart cron
+
+  safe_run
+  while inotifywait -q -e create,delete,modify,attrib,close_write,move /etc/hosts /etc/ssl/private "${HAPROXY_CONFIG}"; do
+    safe_run
+  done
+}
+
+main
