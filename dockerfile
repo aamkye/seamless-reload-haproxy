@@ -4,7 +4,7 @@ ARG GIT_BRANCH
 ARG GIT_DATE
 ARG BUILD_DATE
 
-FROM haproxy:3.1.2
+FROM haproxy:3.1.5
 
 LABEL com.haproxy.git.tag="${GIT_TAG}"
 LABEL com.haproxy.git.sha="${GIT_SHA}"

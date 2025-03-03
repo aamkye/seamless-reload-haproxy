@@ -81,7 +81,7 @@ function main {
   sudo systemctl restart cron
 
   safe_run
-  while inotifywait -q -e create,delete,modify,attrib,close_write,move /etc/hosts /etc/ssl/private "${HAPROXY_CONFIG}"; do
+  while inotifywait -e create,delete,modify,attrib,close_write,move /etc/hosts /etc/ssl/private "${HAPROXY_CONFIG}"; do
     safe_run
   done
 }
